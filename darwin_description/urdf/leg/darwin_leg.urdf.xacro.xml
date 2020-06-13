@@ -54,7 +54,7 @@
     <ankle1_l_visual_geom_macro />
   </link>
 
-  <link name="MP_ANKLE2_L" >
+  <link name="l_sole" >
     <inertial>
       <origin xyz="-0.025995 -0.009506 -0.000503" />
       <mass value="0.0794462"/>
@@ -114,7 +114,7 @@
     <ankle1_r_visual_geom_macro />
   </link>
 
-  <link name="MP_ANKLE2_R" >
+  <link name="r_sole" >
     <inertial>
       <origin xyz="0.025995 -0.009506 -0.000503" />
       <mass value="0.0794462"/>
@@ -171,7 +171,7 @@
 
   <joint name="LAnkleRoll" type="revolute">
     <parent link="MP_ANKLE1_L"/>
-    <child link="MP_ANKLE2_L"/>
+    <child link="l_sole"/>
     <origin xyz="0 0 0" rpy="-1.5707963 0 0" />
     <axis xyz="0 0 1" />
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
@@ -219,7 +219,7 @@
 
   <joint name="RAnkleRoll" type="revolute">
     <parent link="MP_ANKLE1_R"/>
-    <child link="MP_ANKLE2_R"/>
+    <child link="r_sole"/>
     <origin xyz="0 0 0" rpy="-1.5707963 0 0" />
     <axis xyz="0 0 1" />
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
@@ -241,7 +241,7 @@
   <joint_transmission_macro joint_name="RAnkleRoll"/>
 
 
-<gazebo reference="MP_ANKLE2_L">
+<gazebo reference="l_sole">
     
     
     <material>Gazebo/White</material>    
@@ -257,7 +257,7 @@
 
 
 
-<gazebo reference="MP_ANKLE2_R">
+<gazebo reference="r_sole">
     
     
     <material>Gazebo/White</material>
