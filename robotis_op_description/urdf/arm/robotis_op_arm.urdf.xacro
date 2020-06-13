@@ -154,7 +154,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_shoulder_l" type="revolute">
+  <joint name="LShoulderPitch" type="revolute">
     <parent link="MP_BACK_L"/>
     <child link="MP_SHOULDER_L"/>
     <origin xyz="0 0 0" rpy="0 0 -1.5707963" />
@@ -162,7 +162,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_high_arm_l" type="revolute">
+  <joint name="LShoulderRoll" type="revolute">
     <parent link="MP_SHOULDER_L"/>
     <child link="MP_ARM_HIGH_L"/>
     <origin xyz="-0.016 0 0.02165" rpy="1.5707963 0.78539815 0" />
@@ -170,7 +170,7 @@
     <limit effort="2.8" velocity="5.648668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_low_arm_l" type="revolute">
+  <joint name="LElbow" type="revolute">
     <parent link="MP_ARM_HIGH_L"/>
     <child link="MP_ARM_LOW_L"/>
     <origin xyz="-0.06 0 -0.016" rpy="-1.5707963 1.5707963 0" />
@@ -178,7 +178,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_wrist_l" type="revolute">
+  <joint name="j_wrist_l" type="fixed">
     <parent link="MP_ARM_LOW_L"/>
     <child link="MP_ARM_GRIPPER_FIX_L"/>
     <origin xyz="0.048 0.016 0" rpy="1.5707963 0 0" />
@@ -192,7 +192,7 @@
     <origin xyz="0.064 -0.01 0" rpy="0 0 0" />
   </joint>
 
-  <joint name="j_gripper_l" type="revolute">
+  <joint name="j_gripper_l" type="fixed">
     <parent link="MP_ARM_GRIPPER_FIX_L"/>
     <child link="MP_ARM_GRIPPER_MOV_L"/>
     <origin xyz="0.048 0.01 0" rpy="0 0 0" />
@@ -207,7 +207,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_shoulder_r" type="revolute">
+  <joint name="RShoulderPitch" type="revolute">
     <parent link="MP_BACK_R"/>
     <child link="MP_SHOULDER_R"/>
     <origin xyz="0 0 0" rpy="0 0 1.5707963" />
@@ -215,7 +215,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_high_arm_r" type="revolute">
+  <joint name="RShoulderRoll" type="revolute">
     <parent link="MP_SHOULDER_R"/>
     <child link="MP_ARM_HIGH_R"/>
     <origin xyz="-0.016 0 0.02165" rpy="-1.5707963 0.78539815 0" />
@@ -223,7 +223,7 @@
     <limit effort="2.8" velocity="5.648668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_low_arm_r" type="revolute">
+  <joint name="RElbow" type="revolute">
     <parent link="MP_ARM_HIGH_R"/>
     <child link="MP_ARM_LOW_R"/>
     <origin xyz="-0.06 0 -0.016" rpy="1.5707963 1.5707963 0" />
@@ -231,7 +231,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_wrist_r" type="revolute">
+  <joint name="j_wrist_r" type="fixed">
     <parent link="MP_ARM_LOW_R"/>
     <child link="MP_ARM_GRIPPER_FIX_R"/>
     <origin xyz="0.048 -0.016 0" rpy="1.5707963 0 0" />
@@ -245,7 +245,7 @@
     <origin xyz="0.064 -0.01 0" rpy="0 0 0" />
   </joint>
 
-  <joint name="j_gripper_r" type="revolute">
+  <joint name="j_gripper_r" type="fixed">
     <parent link="MP_ARM_GRIPPER_FIX_R"/>
     <child link="MP_ARM_GRIPPER_MOV_R"/>
     <origin xyz="0.048 0.01 0" rpy="0 0 0" />
@@ -253,17 +253,13 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint_transmission_macro joint_name="j_shoulder_l"/>
-  <joint_transmission_macro joint_name="j_high_arm_l"/>
-  <joint_transmission_macro joint_name="j_low_arm_l"/>
-  <joint_transmission_macro joint_name="j_wrist_l"/>
-  <joint_transmission_macro joint_name="j_gripper_l"/>
+  <joint_transmission_macro joint_name="LShoulderRoll"/>
+  <joint_transmission_macro joint_name="LShoulderPitch"/>
+  <joint_transmission_macro joint_name="LElbow"/>
 
-  <joint_transmission_macro joint_name="j_shoulder_r"/>
-  <joint_transmission_macro joint_name="j_high_arm_r"/>
-  <joint_transmission_macro joint_name="j_low_arm_r"/>
-  <joint_transmission_macro joint_name="j_wrist_r"/>
-  <joint_transmission_macro joint_name="j_gripper_r"/>
+  <joint_transmission_macro joint_name="RShoulderRoll"/>
+  <joint_transmission_macro joint_name="RShoulderPitch"/>
+  <joint_transmission_macro joint_name="RElbow"/>
 
 
 

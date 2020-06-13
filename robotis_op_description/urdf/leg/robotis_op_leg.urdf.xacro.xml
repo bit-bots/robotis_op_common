@@ -129,7 +129,7 @@
 
 
 
-  <joint name="j_pelvis_l" type="revolute">
+  <joint name="LHipYaw" type="revolute">
     <parent link="MP_BODY"/>
     <child link="MP_PELVIS_L"/>
     <origin xyz="-0.005 0.037 -0.09355" rpy="0 3.14159 -1.5707963" />
@@ -137,7 +137,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_thigh1_l" type="revolute">
+  <joint name="LHipRoll" type="revolute">
     <parent link="MP_PELVIS_L"/>
     <child link="MP_THIGH1_L"/>
     <origin xyz="0 0 0.028652" rpy="1.5707963 0 0" />
@@ -145,7 +145,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_thigh2_l" type="revolute">
+  <joint name="LHipPitch" type="revolute">
     <parent link="MP_THIGH1_L"/>
     <child link="MP_THIGH2_L"/>
     <origin xyz="0 0 0" rpy="1.5707963 0 -1.5707963" />
@@ -153,7 +153,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_tibia_l" type="revolute">
+  <joint name="LKnee" type="revolute">
     <parent link="MP_THIGH2_L"/>
     <child link="MP_TIBIA_L"/>
     <origin xyz="-0.093 0 0" rpy="0 0 0" />
@@ -161,7 +161,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_ankle1_l" type="revolute">
+  <joint name="LAnklePitch" type="revolute">
     <parent link="MP_TIBIA_L"/>
     <child link="MP_ANKLE1_L"/>
     <origin xyz="-0.093 0 0" rpy="3.14159 0 0" />
@@ -169,7 +169,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_ankle2_l" type="revolute">
+  <joint name="LAnkleRoll" type="revolute">
     <parent link="MP_ANKLE1_L"/>
     <child link="MP_ANKLE2_L"/>
     <origin xyz="0 0 0" rpy="-1.5707963 0 0" />
@@ -177,7 +177,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_pelvis_r" type="revolute">
+  <joint name="RHipYaw" type="revolute">
     <parent link="MP_BODY"/>
     <child link="MP_PELVIS_R"/>
     <origin xyz="-0.005 -0.037 -0.09355" rpy="0 3.14159 1.5707963" />
@@ -185,7 +185,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_thigh1_r" type="revolute">
+  <joint name="RHipRoll" type="revolute">
     <parent link="MP_PELVIS_R"/>
     <child link="MP_THIGH1_R"/>
     <origin xyz="0 0 0.028652" rpy="-1.5707963 0 0" />
@@ -193,7 +193,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_thigh2_r" type="revolute">
+  <joint name="RHipPitch" type="revolute">
     <parent link="MP_THIGH1_R"/>
     <child link="MP_THIGH2_R"/>
     <origin xyz="0 0 0" rpy="1.5707963 0 -1.5707963" />
@@ -201,7 +201,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_tibia_r" type="revolute">
+  <joint name="RKnee" type="revolute">
     <parent link="MP_THIGH2_R"/>
     <child link="MP_TIBIA_R"/>
     <origin xyz="0.093 0 0" rpy="0 0 0" />
@@ -209,7 +209,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_ankle1_r" type="revolute">
+  <joint name="RAnklePitch" type="revolute">
     <parent link="MP_TIBIA_R"/>
     <child link="MP_ANKLE1_R"/>
     <origin xyz="0.093 0 0" rpy="3.14159 0 0" />
@@ -217,7 +217,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_ankle2_r" type="revolute">
+  <joint name="RAnkleRoll" type="revolute">
     <parent link="MP_ANKLE1_R"/>
     <child link="MP_ANKLE2_R"/>
     <origin xyz="0 0 0" rpy="-1.5707963 0 0" />
@@ -226,20 +226,20 @@
   </joint>
 
 
+  <joint_transmission_macro joint_name="LHipYaw"/>
+  <joint_transmission_macro joint_name="LHipRoll"/>
+  <joint_transmission_macro joint_name="LHipPitch"/>
+  <joint_transmission_macro joint_name="LKnee"/>
+  <joint_transmission_macro joint_name="LAnklePitch"/>
+  <joint_transmission_macro joint_name="LAnkleRoll"/>
 
-  <joint_transmission_macro joint_name="j_pelvis_l"/>
-  <joint_transmission_macro joint_name="j_thigh1_l"/>
-  <joint_transmission_macro joint_name="j_thigh2_l"/>
-  <joint_transmission_macro joint_name="j_tibia_l"/>
-  <joint_transmission_macro joint_name="j_ankle1_l"/>
-  <joint_transmission_macro joint_name="j_ankle2_l"/> 
+  <joint_transmission_macro joint_name="RHipYaw"/>
+  <joint_transmission_macro joint_name="RHipRoll"/>
+  <joint_transmission_macro joint_name="RHipPitch"/>
+  <joint_transmission_macro joint_name="RKnee"/>
+  <joint_transmission_macro joint_name="RAnklePitch"/>
+  <joint_transmission_macro joint_name="RAnkleRoll"/>
 
-  <joint_transmission_macro joint_name="j_pelvis_r"/>
-  <joint_transmission_macro joint_name="j_thigh1_r"/>
-  <joint_transmission_macro joint_name="j_thigh2_r"/>
-  <joint_transmission_macro joint_name="j_tibia_r"/>
-  <joint_transmission_macro joint_name="j_ankle1_r"/>
-  <joint_transmission_macro joint_name="j_ankle2_r"/>
 
 <gazebo reference="MP_ANKLE2_L">
     

@@ -34,7 +34,7 @@
   <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_pan" type="revolute">
+  <joint name="HeadPan" type="revolute">
     <parent link="MP_BODY"/>
     <child link="MP_NECK"/>
     <origin xyz="0 0 0.0235" rpy="0 0 1.5707963" />
@@ -42,7 +42,7 @@
     <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
   </joint>
 
-  <joint name="j_tilt" type="revolute">
+  <joint name="HeadTilt" type="revolute">
     <parent link="MP_NECK"/>
     <child link="MP_HEAD"/>
     <origin xyz="0 0 0.02715" rpy="-1.5707963 0 1.5707963" />
@@ -51,8 +51,8 @@
   </joint>
 
 
-  <joint_transmission_macro joint_name="j_pan"/>
-  <joint_transmission_macro joint_name="j_tilt"/>
+  <joint_transmission_macro joint_name="HeadPan"/>
+  <joint_transmission_macro joint_name="HeadTilt"/>
 
 <gazebo reference="MP_HEAD">
         <sensor name='camera' type='camera'>
