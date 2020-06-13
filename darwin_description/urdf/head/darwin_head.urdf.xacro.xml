@@ -39,7 +39,7 @@
     <child link="MP_NECK"/>
     <origin xyz="0 0 0.0235" rpy="0 0 1.5707963" />
     <axis xyz="0 0 1" />
-    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+    <limit effort="2.8" velocity="5.6548668" lower="-1.81" upper="1.81" />
   </joint>
 
   <joint name="HeadTilt" type="revolute">
@@ -47,7 +47,7 @@
     <child link="MP_HEAD"/>
     <origin xyz="0 0 0.02715" rpy="-1.5707963 0 1.5707963" />
     <axis xyz="0 0 1" />
-    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+    <limit effort="2.8" velocity="5.6548668" lower="-0.36" upper="0.94" />
   </joint>
 
 
