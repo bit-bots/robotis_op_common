@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+<!-- Set the robot's name -->
+<robot  name="darwin2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+  <macro name="darwin_arm_macro">
+
+  <link name="MP_BACK_L">
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.01" y_length="0.01" z_length="0.01" >
+      <origin xyz="-0.0031158909 0.020443695 -0.019663084" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:back_l_collision_geom_macro />
+    <xacro:back_l_visual_geom_macro />
+  </link>  
+
+  <link name="MP_SHOULDER_L">
+    <xacro:inertial_cuboid__with_pose_macro mass="0.025913024" x_length="0.016" y_length="0.033" z_length="0.02165" >
+      <origin xyz="-0.013522619 -0.010264050 0.0013935747" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:shoulder_l_collision_geom_macro />
+    <xacro:shoulder_l_visual_geom_macro />  
+  </link>
+
+  <link name="MP_ARM_HIGH_L" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.16837715" x_length="0.06" y_length="0.032" z_length="0.035" >
+      <origin xyz="-0.036239 0.000734 0.000660" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_high_l_collision_geom_macro />
+    <xacro:arm_high_l_visual_geom_macro />  
+  </link>
+
+  <link name="MP_ARM_LOW_L" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.059288504" x_length="0.032" y_length="0.032" z_length="0.035" >
+      <origin xyz="0.016 0.016 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_low_l_collision_geom_macro />
+    <xacro:arm_low_l_visual_geom_macro /> 
+  </link>
+
+
+ <link name="MP_ARM_GRIPPER_FIX_L" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0.016 0 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_fix_l_collision_geom_macro />
+    <xacro:arm_gripper_fix_l_visual_geom_macro /> 
+  </link>
+
+  <link name="MP_ARM_GRIPPER_FIX_DUMMY_L" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_fix_dummy_l_collision_geom_macro />
+    <xacro:arm_gripper_fix_dummy_l_visual_geom_macro /> 
+  </link>
+
+  <link name="MP_ARM_GRIPPER_MOV_L" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0.016 0 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_mov_l_collision_geom_macro />
+    <xacro:arm_gripper_mov_l_visual_geom_macro />
+  </link>
+
+  <link name="MP_BACK_R">
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.01" y_length="0.01" z_length="0.01" >
+      <origin xyz="0.0031158909 0.020443695 -0.019663084" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:back_r_collision_geom_macro />
+    <xacro:back_r_visual_geom_macro />   
+  </link>
+
+  <link name="MP_SHOULDER_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.025913024" x_length="0.016" y_length="0.033" z_length="0.02165" >
+      <origin xyz="-0.013523 0.010264 0.001394" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:shoulder_r_collision_geom_macro />
+    <xacro:shoulder_r_visual_geom_macro />  
+  </link>
+
+  <link name="MP_ARM_HIGH_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.16837715" x_length="0.06" y_length="0.032" z_length="0.035" >
+      <origin xyz="-0.036239 0.000734 -0.000660" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_high_r_collision_geom_macro />
+    <xacro:arm_high_r_visual_geom_macro />  
+  </link>
+
+  <link name="MP_ARM_LOW_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.059288504" x_length="0.032" y_length="0.032" z_length="0.035" >
+      <origin xyz="0.000000 0.000000 0.000000" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_low_r_collision_geom_macro />
+    <xacro:arm_low_r_visual_geom_macro />
+  </link>
+
+  <link name="MP_ARM_GRIPPER_FIX_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0.016 0 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_fix_r_collision_geom_macro />
+    <xacro:arm_gripper_fix_r_visual_geom_macro />
+  </link>
+
+  <link name="MP_ARM_GRIPPER_FIX_DUMMY_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0.0 0.0 0.0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_fix_dummy_r_collision_geom_macro />
+    <xacro:arm_gripper_fix_dummy_r_visual_geom_macro />
+  </link>
+
+  <link name="MP_ARM_GRIPPER_MOV_R" >
+    <xacro:inertial_cuboid__with_pose_macro mass="0.010" x_length="0.032" y_length="0.005" z_length="0.032" >
+      <origin xyz="0.016 0 0" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <xacro:arm_gripper_mov_r_collision_geom_macro />
+    <xacro:arm_gripper_mov_r_visual_geom_macro />
+  </link>
+
+
+  <joint name="j_back_l" type="fixed">
+    <parent link="MP_BODY"/>
+    <child link="MP_BACK_L"/>
+    <origin xyz="0 0.06035 0" rpy="-1.5707963 0 0" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_shoulder_l" type="revolute">
+    <parent link="MP_BACK_L"/>
+    <child link="MP_SHOULDER_L"/>
+    <origin xyz="0 0 0" rpy="0 0 -1.5707963" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_high_arm_l" type="revolute">
+    <parent link="MP_SHOULDER_L"/>
+    <child link="MP_ARM_HIGH_L"/>
+    <origin xyz="-0.016 0 0.02165" rpy="1.5707963 0.78539815 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.648668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_low_arm_l" type="revolute">
+    <parent link="MP_ARM_HIGH_L"/>
+    <child link="MP_ARM_LOW_L"/>
+    <origin xyz="-0.06 0 -0.016" rpy="-1.5707963 1.5707963 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_wrist_l" type="revolute">
+    <parent link="MP_ARM_LOW_L"/>
+    <child link="MP_ARM_GRIPPER_FIX_L"/>
+    <origin xyz="0.048 0.016 0" rpy="1.5707963 0 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_wrist_dummy_l" type="fixed">
+    <parent link="MP_ARM_GRIPPER_FIX_L"/>
+    <child link="MP_ARM_GRIPPER_FIX_DUMMY_L"/>
+    <origin xyz="0.064 -0.01 0" rpy="0 0 0" />
+  </joint>
+
+  <joint name="j_gripper_l" type="revolute">
+    <parent link="MP_ARM_GRIPPER_FIX_L"/>
+    <child link="MP_ARM_GRIPPER_MOV_L"/>
+    <origin xyz="0.048 0.01 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_back_r" type="fixed">
+    <parent link="MP_BODY"/>
+    <child link="MP_BACK_R"/>
+    <origin xyz="0 -0.06035 0" rpy="1.5707963 0 0" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_shoulder_r" type="revolute">
+    <parent link="MP_BACK_R"/>
+    <child link="MP_SHOULDER_R"/>
+    <origin xyz="0 0 0" rpy="0 0 1.5707963" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_high_arm_r" type="revolute">
+    <parent link="MP_SHOULDER_R"/>
+    <child link="MP_ARM_HIGH_R"/>
+    <origin xyz="-0.016 0 0.02165" rpy="-1.5707963 0.78539815 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.648668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_low_arm_r" type="revolute">
+    <parent link="MP_ARM_HIGH_R"/>
+    <child link="MP_ARM_LOW_R"/>
+    <origin xyz="-0.06 0 -0.016" rpy="1.5707963 1.5707963 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_wrist_r" type="revolute">
+    <parent link="MP_ARM_LOW_R"/>
+    <child link="MP_ARM_GRIPPER_FIX_R"/>
+    <origin xyz="0.048 -0.016 0" rpy="1.5707963 0 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint name="j_wrist_dummy_r" type="fixed">
+    <parent link="MP_ARM_GRIPPER_FIX_R"/>
+    <child link="MP_ARM_GRIPPER_FIX_DUMMY_R"/>
+    <origin xyz="0.064 -0.01 0" rpy="0 0 0" />
+  </joint>
+
+  <joint name="j_gripper_r" type="revolute">
+    <parent link="MP_ARM_GRIPPER_FIX_R"/>
+    <child link="MP_ARM_GRIPPER_MOV_R"/>
+    <origin xyz="0.048 0.01 0" rpy="0 0 0" />
+    <axis xyz="0 0 1" />
+    <limit effort="2.8" velocity="5.6548668" lower="-2.6179939" upper="2.6179939" />
+  </joint>
+
+  <joint_transmission_macro joint_name="j_shoulder_l"/>
+  <joint_transmission_macro joint_name="j_high_arm_l"/>
+  <joint_transmission_macro joint_name="j_low_arm_l"/>
+  <joint_transmission_macro joint_name="j_wrist_l"/>
+  <joint_transmission_macro joint_name="j_gripper_l"/>
+
+  <joint_transmission_macro joint_name="j_shoulder_r"/>
+  <joint_transmission_macro joint_name="j_high_arm_r"/>
+  <joint_transmission_macro joint_name="j_low_arm_r"/>
+  <joint_transmission_macro joint_name="j_wrist_r"/>
+  <joint_transmission_macro joint_name="j_gripper_r"/>
+
+
+
+  </macro>
+</robot>

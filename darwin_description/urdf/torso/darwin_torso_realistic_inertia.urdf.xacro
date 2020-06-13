@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!-- Set the robot's name -->
+<robot  name="darwin2" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <macro name="darwin_torso_macro">
+
+  <link name="base_link"/>  
+
+  <link name="MP_BODY">
+    <xacro:inertial_cuboid__with_pose_macro mass="0.97559947" x_length="0.102" y_length="0.109" z_length="0.106" >
+      <origin xyz="-0.0235 0 -0.03525" rpy="0 0 0" />
+    </xacro:inertial_cuboid__with_pose_macro>
+    <body_collision_geom_macro />
+    <body_visual_geom_macro />
+  </link>
+
+  <joint name="base_link_to_body" type="fixed">
+    <parent link="base_link"/>
+    <child link="MP_BODY"/>
+    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+  </joint>
+
+
+      <gazebo>
+        <plugin filename="libhector_gazebo_ros_imu.so" name="gazebo_ros_imu">
+          <bodyName>MP_BODY</bodyName>
+          <updateRate>50</updateRate>
+          <serviceName>/darwin/imu_service</serviceName>
+          <topicName>/darwin/imu</topicName>
+          <gaussianNoise>0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 -0.703220730592</rpyOffset>
+        </plugin>     
+      </gazebo>  
+
+  </macro>
+</robot>

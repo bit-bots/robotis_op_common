@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<robot name="darwin" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find darwin_description)/urdf/darwin_simple_mesh_visual_geoms.urdf.xacro.xml" />
+
+  <xacro:include filename="$(find darwin_description)/urdf/darwin_primitive_collision_geoms.urdf.xacro.xml" />
+
+  <xacro:include filename="$(find darwin_description)/urdf/helper_macros.urdf.xacro.xml" />
+  
+  <xacro:include filename="$(find darwin_description)/urdf/materials.xacro" />
+
+  <xacro:include filename="$(find darwin_description)/urdf/arm/darwin_arm.urdf.xacro" />
+  <xacro:include filename="$(find darwin_description)/urdf/torso/darwin_torso.urdf.xacro" />
+<xacro:include filename="$(find darwin_description)/urdf/leg/darwin_leg.urdf.xacro.xml" />
+  <xacro:include filename="$(find darwin_description)/urdf/head/darwin_head.urdf.xacro.xml" />
+
+  <macro name="darwin_macro">
+ 
+  <darwin_torso_macro />
+  <darwin_arm_macro />
+  <darwin_head_macro />
+  <darwin_leg_macro />
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>darwin</robotNamespace>
+    </plugin>
+  </gazebo>
+</macro>
+
+</robot>
