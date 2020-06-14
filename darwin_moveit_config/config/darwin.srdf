@@ -40,10 +40,10 @@
         <joint name="RAnkleRoll" />
     </group>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
-    <disable_collisions link1="MP_ANKLE1_L" link2="MP_ANKLE2_L" reason="Adjacent" />
     <disable_collisions link1="MP_ANKLE1_L" link2="MP_TIBIA_L" reason="Adjacent" />
-    <disable_collisions link1="MP_ANKLE1_R" link2="MP_ANKLE2_R" reason="Adjacent" />
+    <disable_collisions link1="MP_ANKLE1_L" link2="l_sole" reason="Adjacent" />
     <disable_collisions link1="MP_ANKLE1_R" link2="MP_TIBIA_R" reason="Adjacent" />
+    <disable_collisions link1="MP_ANKLE1_R" link2="r_sole" reason="Adjacent" />
     <disable_collisions link1="MP_ARM_GRIPPER_FIX_DUMMY_L" link2="MP_ARM_GRIPPER_FIX_L" reason="Adjacent" />
     <disable_collisions link1="MP_ARM_GRIPPER_FIX_DUMMY_L" link2="MP_ARM_GRIPPER_MOV_L" reason="Never" />
     <disable_collisions link1="MP_ARM_GRIPPER_FIX_DUMMY_L" link2="MP_ARM_HIGH_L" reason="Never" />

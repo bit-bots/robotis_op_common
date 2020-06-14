@@ -3,7 +3,7 @@
 
   <!-- description file for robot -->
   <param name="robot_description"
-   command="$(find xacro)/xacro.py '$(find darwin_description)/robots/darwin.urdf.xacro'" />
+   command="$(find xacro)/xacro.py '$(find darwin_description)/urdf/darwin.urdf.xacro'" />
 
   <!-- robot_state_publisher node -->
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />

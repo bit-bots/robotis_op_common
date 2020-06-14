@@ -19,7 +19,7 @@
   <joint name="base_link_to_body" type="fixed">
     <parent link="base_link"/>
     <child link="MP_BODY"/>
-    <origin xyz="0 0 0.35" rpy="0 0 0"/>
+    <origin xyz="0.005 0 0.09355" rpy="0 0 0"/>
   </joint>
 
 
