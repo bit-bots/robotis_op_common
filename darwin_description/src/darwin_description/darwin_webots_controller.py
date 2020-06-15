@@ -70,7 +70,8 @@ class DarwinWebotsController:
         self.motors = []
         self.sensors = []
         self.timestep = int(self.supervisor.getBasicTimeStep())
-        self.timestep = 10
+        # self.timestep = 10
+        self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_RUN)
 
         for motor_name in self.motor_names:
             self.motors.append(self.supervisor.getMotor(motor_name))
@@ -150,6 +151,12 @@ class DarwinWebotsController:
                 math.pi / 180)  # is 400 deg/s the real value
         msg.angular_velocity.y = ((gyro_vels[1] - 512.0) / 512.0) * 1600 * (math.pi / 180)
         msg.angular_velocity.z = ((gyro_vels[2] - 512.0) / 512.0) * 1600 * (math.pi / 180)
+
+        #todo compute
+        msg.orientation.x = 0
+        msg.orientation.y = 0
+        msg.orientation.z = 0
+        msg.orientation.w = 1
         self.pub_imu.publish(msg)
 
     def publish_camera(self):
