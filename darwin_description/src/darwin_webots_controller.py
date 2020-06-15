@@ -10,6 +10,7 @@ from rosgraph_msgs.msg import Clock
 from bitbots_msgs.msg import JointCommand
 import math
 import os
+import numpy as np
 
 G = 9.8
 
@@ -20,6 +21,25 @@ class DarwinController:
         self.clock_msg = Clock()
         self.namespace = namespace
         self.supervisor = Supervisor()
+
+        self.darwin = self.supervisor.getFromDef("Darwin")
+        self.kicked_ball = self.supervisor.getFromDef("kickedball")
+        self.target_ball = self.supervisor.getFromDef("targetball")
+        self.mines = [self.supervisor.getFromDef(f"dilei{i}") for i in range(8)]
+        self.barrier_bar = self.supervisor.getFromDef("Barrier_Bar")
+        self.gate_posts = [self.supervisor.getFromDef(f"door_{i}") for i in [1, 2]]
+
+        self.kicked_ball_translation_field = self.kicked_ball.getField("translation")
+        self.target_ball_translation_field = self.target_ball.getField("translation")
+        self.darwin_translation_field = self.darwin.getField("translation")
+        self.mines_translation_field = [mine.getField("translation") for mine in self.mines]
+        self.gate_posts_translation_field = [post.getField("translation") for post in self.gate_posts]
+
+        self.darwin_rotation_field = self.darwin.getField("rotation")
+        self.barrier_bar_rotation = self.barrier_bar.getField("rotation")
+
+        self.inertial_target_ball_position_ros = pos_webots_to_ros(self.target_ball_translation_field.getSFVec3f())  # ROS
+        self.min_ball_loss = 1
 
         self.motor_names = ["ShoulderR", "ShoulderL", "ArmUpperR", "ArmUpperL", "ArmLowerR", "ArmLowerL",
                             "PelvYR", "PelvYL", "PelvR", "PelvL", "LegUpperR", "LegUpperL", "LegLowerR", "LegLowerL",
@@ -107,6 +127,16 @@ class DarwinController:
     def step(self):
         self.step_sim()
         self.time += self.timestep / 1000
+
+        # Rewards...
+        print(f"Out of world bounds: {self.out_of_world_bounds()}")
+        print(f"Mine distance loss: {self.near_mines_loss()}")
+        print(f"Bad gate loss: {self.bad_gate_loss()}")
+        print(f"Ball loss: {self.ball_loss()}")
+        print(f"Robot to target ball distance loss: {self.target_ball_loss()}")
+        print(f"Robot fall: {self.robot_fallen()}")
+        print(f"Bad bar passing: {self.bad_bar()}")
+        print("------------------------------")
         self.publish_imu()
         self.publish_joint_states()
         self.clock_msg.clock = rospy.Time.from_seconds(self.time)
@@ -195,6 +225,123 @@ class DarwinController:
         rot = self.rotation_field.getSFRotation()
         return pos_webots_to_ros(pos), axis_to_rpy(*rot)
 
+    def get_pose(self):
+        for s in self.sensors:
+            print(s.getValue())
+        print(self.darwin.getPosition())
+
+        self.darwin.getField("translation").setSFVec3f([0.0, 0.9, 0.9])
+        self.darwin.getField("rotation").setSFRotation(
+            [0.9999802872027697, 0.006194873435731058, -0.0010240844602197568,
+             -0.006274378436638787, 0.9920944235596189, -0.12533669421658336,
+             0.00023954352471342364, 0.12534064897319927, 0.9921137355837167])
+        # TODO reset physics such that velocities are reset as well
+
+    def out_of_world_bounds(self):
+        """
+        Returns True, if robot lays on the floor (not on the track) or is outside the playing field
+        """
+        # Define world bounds (as 3D bounding box) which also exclude the sim ground
+        world_bounds = ((0.45, -0.53, 0.5), (8.0, 8.85, 1.5))  # ROS
+        # Get Darwin position
+        darwin_position = pos_webots_to_ros(self.darwin_translation_field.getSFVec3f())
+        # Check if we are out of bounds
+        return not ros_pos_in_box(darwin_position, world_bounds)
+
+    def near_mines_loss(self):
+        """
+        Returns a non linear score between 0 and 1 that increases in proximity to mines
+        """
+        # Get mine positions
+        mine_positions = np.array(
+            [pos_webots_to_ros(mine.getSFVec3f()) for mine in self.mines_translation_field])
+        # Get Darwin position
+        darwin_position = np.array(pos_webots_to_ros(self.darwin_translation_field.getSFVec3f()))
+
+        return proximity_loss(mine_positions, darwin_position, ignore_z=True, power=6, scale=0.00002, clip=1)
+
+    def bad_gate_loss(self):
+        """
+        Returns a non linear score between 0  and 1 that increases in proximity to the gate
+        """
+        danger_zone1 = ((7.76, 1.8), (8.01, 2.08))  # ROS
+        danger_zone2 = ((7.03, 1.8), (7.15, 2.08))  # ROS
+
+        # Get Darwin position
+        darwin_position = np.array(pos_webots_to_ros(self.darwin_translation_field.getSFVec3f()))
+
+        # Check for robot in some danger zone
+        if ros_pos_in_box(darwin_position, danger_zone1) or ros_pos_in_box(darwin_position, danger_zone2):
+            return 1
+
+        post_positions = np.array(
+            [pos_webots_to_ros(post.getSFVec3f()) for post in self.gate_posts_translation_field])
+
+        # Calculate loss near gate posts
+        return proximity_loss(post_positions, darwin_position, ignore_z=True, power=6, scale=0.00002, clip=1)
+
+
+    def bad_bar(self):
+        """
+        Returns True, if robot near barrier bar and bar is down
+        """
+        # Define danger zone near barrier bar (as 2D bounding box on the ground)
+        danger_zone = ((1.1, -0.45), (1.4, 0.43))  # ROS
+        # Get Darwin position
+        darwin_position = pos_webots_to_ros(self.darwin_translation_field.getSFVec3f())
+        # Check if bar is down
+        bar_down = axis_to_rpy(*self.barrier_bar_rotation.getSFRotation())[0] > 0.1
+        # Check if we are in danger
+        return bar_down and ros_pos_in_box(darwin_position, danger_zone)
+
+    def ball_loss(self):
+        """
+        Returns a float representing the proximity of the ball to its target position as a loss between 1 und 0.
+        Lower is better.
+        """
+        target = np.array([self.inertial_target_ball_position_ros])
+        ball_position = np.array(pos_webots_to_ros(self.kicked_ball_translation_field.getSFVec3f()))
+        # Calculate loss based on how close the balls are
+        ball_loss_val = proximity_loss(target, ball_position, ignore_z=True, power=1, scale=0.1, clip=1, inv=True)
+        self.min_ball_loss = min(self.min_ball_loss, ball_loss_val)
+        return self.min_ball_loss
+
+    def target_ball_loss(self):
+        """
+        Returns a float representing the proximity of the robot to target ball as a loss between 1 und 0.
+        The loss increases if both are closer.
+        Lower is better.
+        """
+        # Get Darwin position
+        darwin_position = np.array(pos_webots_to_ros(self.darwin_translation_field.getSFVec3f()))
+
+        target_ball_position = np.array([pos_webots_to_ros(self.target_ball_translation_field.getSFVec3f())])
+        # Calculate loss near gate posts
+        return proximity_loss(target_ball_position, darwin_position, ignore_z=True, power=6, scale=0.00002, clip=1)
+
+    def robot_fallen(self):
+        """
+        Returns a True if robot is fallen.
+        """
+        rpy_rot = axis_to_rpy(*self.darwin_rotation_field.getSFRotation())
+        return bool(abs(rpy_rot[0]) > 1 or abs(rpy_rot[1]) > 1)
+
+
+def ros_pos_in_box(pos, box):
+    """
+    USE ROS Conventions!
+    Returns True, if position in multi-dimensional bounding box described as follows:
+    Bounding box is ((ax, ay, az, ...), (bx, by, bz, ...)) with ai <= bi for i in {x, y, z, ...}.
+    """
+    return all([box[0][i] <= pos[i] <= box[1][i] for i in range(len(box[0]))])
+
+
+def distance(a, b):
+    """
+    Returns the euclidean distance between the arrays in the first dimension
+    """
+    return np.sqrt(np.sum(np.power(a - b, 2), axis=1))
+
 
 def pos_webots_to_ros(pos):
     x = pos[2]
@@ -271,3 +418,42 @@ def axis_to_rpy(x, y, z, angle):
     roll = math.atan2(x * s - y * z * t, 1 - (x * x + z * z) * t)
 
     return roll, pitch, yaw
+
+
+def proximity_loss(object_positions, agent_position, ignore_z=True, power=6.0, scale=0.00002, clip=1.0, inv=False):
+    """
+    USE ROS notation
+    Calculates a non linear loss based on the distance from the agent to a list of objects.
+    The non-linearity is applied before the distances are summed.
+
+    :param object_positions ndarray: List of object positions in ROS notation
+    :param agent_position ndarray: Agent position in ROS notation
+    :param ignore_z bool: Operate only in 2D (ignoring Z-axis)
+    :param power float: Exponent applied to each distance
+    :param scale float: Scale applied before clipping
+    :param clip float: Max output value
+    """
+    # Ignore Z coordinate
+    if ignore_z:
+        agent_position[2] = 0
+        object_positions[:, 2] = 0
+    # Equalize shapes
+    agent_positions = np.repeat(np.expand_dims(agent_position, axis=0), object_positions.shape[0], axis=0)
+    # Get distance to each object
+    distances = distance(object_positions, agent_positions)
+    # Scale each distance non linear
+    non_linear_scale = np.power(1 / distances, power) * scale
+    # Sum them up and limit the value
+    val = min(np.sum(non_linear_scale), clip)
+    if inv:
+        return 1 - val
+    return val
+
+
+if __name__ == '__main__':
+    env = DarwinController()
+    max_time = 15000
+    episode = 0
+    while episode < max_time and not rospy.is_shutdown():
+        env.step()
+        episode+=1
