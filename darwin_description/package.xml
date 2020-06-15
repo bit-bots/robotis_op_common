@@ -17,6 +17,7 @@
   <author email="passionvirus@gmail.com">Yoonseok Pyo</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
 
   <export>
   </export>

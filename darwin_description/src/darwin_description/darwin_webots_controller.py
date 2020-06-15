@@ -15,7 +15,7 @@ import numpy as np
 G = 9.8
 
 
-class DarwinController:
+class DarwinWebotsController:
     def __init__(self, namespace='', node=True):
         self.time = 0
         self.clock_msg = Clock()
