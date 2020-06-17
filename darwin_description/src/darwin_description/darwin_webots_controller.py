@@ -124,7 +124,7 @@ class DarwinWebotsController:
         self.publish_imu()
         self.publish_camera()
 
-    def publish_joint_states(self):
+    def get_joint_state_msg(self):
         js = JointState()
         js.name = []
         js.header.stamp = rospy.get_rostime()
@@ -136,8 +136,12 @@ class DarwinWebotsController:
             js.position.append(value)
             js.effort.append(self.motors[i].getTorqueFeedback())
         self.pub_js.publish(js)
+        return js
 
-    def publish_imu(self):
+    def publish_joint_states(self):
+        self.pub_js.publish(self.get_joint_state_msg())
+
+    def get_imu_msg(self):
         msg = Imu()
         msg.header.stamp = rospy.get_rostime()
         msg.header.frame_id = "imu_frame"
@@ -152,12 +156,15 @@ class DarwinWebotsController:
         msg.angular_velocity.y = ((gyro_vels[1] - 512.0) / 512.0) * 1600 * (math.pi / 180)
         msg.angular_velocity.z = ((gyro_vels[2] - 512.0) / 512.0) * 1600 * (math.pi / 180)
 
-        #todo compute
+        # todo compute
         msg.orientation.x = 0
         msg.orientation.y = 0
         msg.orientation.z = 0
         msg.orientation.w = 1
-        self.pub_imu.publish(msg)
+        return msg
+
+    def publish_imu(self):
+        self.pub_imu.publish(self.get_imu_msg())
 
     def publish_camera(self):
         img_msg = Image()
