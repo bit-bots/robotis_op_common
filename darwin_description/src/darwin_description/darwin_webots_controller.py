@@ -15,7 +15,7 @@ G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', node=True):
+    def __init__(self, namespace='', node=True, mode='normal'):
         self.time = 0
         self.clock_msg = Clock()
         self.namespace = namespace
@@ -71,7 +71,17 @@ class DarwinWebotsController:
         self.sensors = []
         self.timestep = int(self.supervisor.getBasicTimeStep())
         # self.timestep = 10
-        self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_RUN)
+        if mode == 'normal':
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_REAL_TIME)
+        elif mode == 'paused':
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_PAUSE)
+        elif mode == 'run':
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_RUN)
+        elif mode == 'fast':
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_FAST)
+        else:
+            self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_REAL_TIME)
+
 
         for motor_name in self.motor_names:
             self.motors.append(self.supervisor.getMotor(motor_name))
@@ -103,13 +113,16 @@ class DarwinWebotsController:
         self.rotation_field = self.robot_node.getField("rotation")
 
     def step_sim(self):
+        self.time += self.timestep / 1000
         self.supervisor.step(self.timestep)
 
     def step(self):
         self.step_sim()
-        self.time += self.timestep / 1000
         self.publish_imu()
         self.publish_joint_states()
+        self.publish_clock()
+
+    def publish_clock(self):
         self.clock_msg.clock = rospy.Time.from_seconds(self.time)
         self.clock_publisher.publish(self.clock_msg)
 
@@ -127,7 +140,7 @@ class DarwinWebotsController:
     def get_joint_state_msg(self):
         js = JointState()
         js.name = []
-        js.header.stamp = rospy.get_rostime()
+        js.header.stamp = rospy.Time.from_seconds(self.time)
         js.position = []
         js.effort = []
         for i in range(len(self.sensors)):
@@ -143,7 +156,7 @@ class DarwinWebotsController:
 
     def get_imu_msg(self):
         msg = Imu()
-        msg.header.stamp = rospy.get_rostime()
+        msg.header.stamp = rospy.Time.from_seconds(self.time)
         msg.header.frame_id = "imu_frame"
         accel_vels = self.accel.getValues()
 
@@ -168,7 +181,7 @@ class DarwinWebotsController:
 
     def publish_camera(self):
         img_msg = Image()
-        img_msg.header.stamp = rospy.get_rostime()
+        img_msg.header.stamp = rospy.Time.from_seconds(self.time)
         img_msg.height = self.camera.getHeight()
         img_msg.width = self.camera.getWidth()
         img_msg.encoding = "bgra8"
