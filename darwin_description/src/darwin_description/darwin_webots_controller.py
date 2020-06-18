@@ -118,6 +118,7 @@ class DarwinWebotsController:
 
     def step(self):
         self.step_sim()
+        #todo only do if we have subsriber to improve runtime
         self.publish_imu()
         self.publish_joint_states()
         self.publish_clock()
@@ -133,9 +134,6 @@ class DarwinWebotsController:
                 self.motors[motor_index].setPosition(command.positions[i])
             except ValueError:
                 print(f"invalid motor specified ({self.names_bitbots_to_webots[name]})")
-        self.publish_joint_states()
-        self.publish_imu()
-        self.publish_camera()
 
     def get_joint_state_msg(self):
         js = JointState()
