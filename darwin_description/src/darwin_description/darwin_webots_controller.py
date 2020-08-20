@@ -15,7 +15,8 @@ G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', node=True, mode='normal'):
+    def __init__(self, namespace='', ros_active=True, mode='normal'):
+        self.ros_active = ros_active
         self.time = 0
         self.clock_msg = Clock()
         self.namespace = namespace
@@ -96,14 +97,14 @@ class DarwinWebotsController:
         self.camera = self.supervisor.getCamera("Camera")
         self.camera.enable(self.timestep)
 
-        if node:
+        if self.ros_active:
             rospy.init_node("webots_darwin_ros_interface", anonymous=True,
                             argv=['clock:=/' + self.namespace + '/clock'])
-        self.pub_js = rospy.Publisher(self.namespace + "/joint_states", JointState, queue_size=1)
-        self.pub_imu = rospy.Publisher(self.namespace + "/imu/data", Imu, queue_size=1)
-        self.pub_cam = rospy.Publisher(self.namespace + "/image_raw", Image, queue_size=1)
-        self.clock_publisher = rospy.Publisher(self.namespace + "/clock", Clock, queue_size=1)
-        rospy.Subscriber(self.namespace + "/DynamixelController/command", JointCommand, self.command_cb)
+            self.pub_js = rospy.Publisher(self.namespace + "/joint_states", JointState, queue_size=1)
+            self.pub_imu = rospy.Publisher(self.namespace + "/imu/data", Imu, queue_size=1)
+            self.pub_cam = rospy.Publisher(self.namespace + "/image_raw", Image, queue_size=1)
+            self.clock_publisher = rospy.Publisher(self.namespace + "/clock", Clock, queue_size=1)
+            rospy.Subscriber(self.namespace + "/DynamixelController/command", JointCommand, self.command_cb)
 
         self.world_info = self.supervisor.getFromDef("world_info")
         self.hinge_joint = self.supervisor.getFromDef("barrier_hinge")
@@ -118,10 +119,10 @@ class DarwinWebotsController:
 
     def step(self):
         self.step_sim()
-        #todo only do if we have subsriber to improve runtime
-        self.publish_imu()
-        self.publish_joint_states()
-        self.publish_clock()
+        if self.ros_active:
+            self.publish_imu()
+            self.publish_joint_states()
+            self.publish_clock()
 
     def publish_clock(self):
         self.clock_msg.clock = rospy.Time.from_seconds(self.time)
@@ -146,7 +147,8 @@ class DarwinWebotsController:
             value = self.sensors[i].getValue()
             js.position.append(value)
             js.effort.append(self.motors[i].getTorqueFeedback())
-        self.pub_js.publish(js)
+        if self.ros_active:
+            self.pub_js.publish(js)
         return js
 
     def publish_joint_states(self):
