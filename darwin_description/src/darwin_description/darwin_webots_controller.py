@@ -190,6 +190,9 @@ class DarwinWebotsController:
         img_msg.data = img
         self.pub_cam.publish(img_msg)
 
+    def get_image(self):
+        return self.camera.getImage()
+
     def set_gravity(self, active):
         if active:
             self.world_info.getField("gravity").setSFVec3f([0.0, -9.81, 0.0])
