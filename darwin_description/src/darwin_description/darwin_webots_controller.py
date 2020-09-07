@@ -136,6 +136,9 @@ class DarwinWebotsController:
             except ValueError:
                 print(f"invalid motor specified ({self.names_bitbots_to_webots[name]})")
 
+    def set_head_tilt(self, pos):
+        self.motors[-1].setPosition(pos)
+
     def get_joint_state_msg(self):
         js = JointState()
         js.name = []
