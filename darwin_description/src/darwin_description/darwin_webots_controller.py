@@ -83,7 +83,6 @@ class DarwinWebotsController:
         else:
             self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_REAL_TIME)
 
-
         for motor_name in self.motor_names:
             self.motors.append(self.supervisor.getMotor(motor_name))
             self.motors[-1].enableTorqueFeedback(self.timestep)
@@ -199,8 +198,11 @@ class DarwinWebotsController:
     def set_gravity(self, active):
         if active:
             self.world_info.getField("gravity").setSFVec3f([0.0, -9.81, 0.0])
+            self.world_info.getField("gravity").setSFFloat(9.81)
         else:
             self.world_info.getField("gravity").setSFVec3f([0.0, 0.0, 0.0])
+            self.world_info.getField("gravity").setSFFloat(0)
+
 
     def reset_robot_pose(self, pos, quat):
         rpy = tf.transformations.euler_from_quaternion(quat)
