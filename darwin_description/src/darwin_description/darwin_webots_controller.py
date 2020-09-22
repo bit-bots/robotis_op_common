@@ -15,7 +15,7 @@ G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', ros_active=True, mode='normal'):
+    def __init__(self, namespace='', ros_active=False, mode='normal'):
         self.ros_active = ros_active
         self.time = 0
         self.clock_msg = Clock()
@@ -214,7 +214,13 @@ class DarwinWebotsController:
         self.robot_node.resetPhysics()
 
     def reset(self):
-        self.supervisor.simulationReset()
+        #self.supervisor.simulationReset()
+        #reactivate camera after reset https://github.com/cyberbotics/webots/issues/1778
+        #self.supervisor.getSelf().restartController()
+        #self.camera = self.supervisor.getCamera("Camera")
+        #self.camera.enable(self.timestep)
+        self.supervisor.simulationResetPhysics()
+
 
     def node(self):
         s = self.supervisor.getSelected()
