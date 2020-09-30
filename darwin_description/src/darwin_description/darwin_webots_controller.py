@@ -15,7 +15,7 @@ G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', ros_active=True, mode='normal'):
+    def __init__(self, namespace='', ros_active=False, mode='normal'):
         self.ros_active = ros_active
         self.time = 0
         self.clock_msg = Clock()
@@ -115,6 +115,7 @@ class DarwinWebotsController:
     def step_sim(self):
         self.time += self.timestep / 1000
         self.supervisor.step(self.timestep)
+        # print(self.sensors[0].getValue(),  self.sensors[1].getValue(), self.sensors[2].getValue(),  self.sensors[3].getValue(), self.sensors[4].getValue(),  self.sensors[5].getValue())
 
     def step(self):
         self.step_sim()
@@ -137,6 +138,12 @@ class DarwinWebotsController:
 
     def set_head_tilt(self, pos):
         self.motors[-1].setPosition(pos)
+
+    def set_arms_zero(self):
+        positions = [-0.8399999308200574, 0.7200000596634105, -0.3299999109923385, 0.35999992683575216,
+                     0.5099999812500172, -0.5199999789619728]
+        for i in range(0, 6):
+            self.motors[i].setPosition(positions[i])
 
     def get_joint_state_msg(self):
         js = JointState()
@@ -203,7 +210,6 @@ class DarwinWebotsController:
             self.world_info.getField("gravity").setSFVec3f([0.0, 0.0, 0.0])
             self.world_info.getField("gravity").setSFFloat(0)
 
-
     def reset_robot_pose(self, pos, quat):
         rpy = tf.transformations.euler_from_quaternion(quat)
         self.set_robot_pose_rpy(pos, rpy)
@@ -214,7 +220,12 @@ class DarwinWebotsController:
         self.robot_node.resetPhysics()
 
     def reset(self):
-        self.supervisor.simulationReset()
+        # self.supervisor.simulationReset()
+        # reactivate camera after reset https://github.com/cyberbotics/webots/issues/1778
+        # self.supervisor.getSelf().restartController()
+        # self.camera = self.supervisor.getCamera("Camera")
+        # self.camera.enable(self.timestep)
+        self.supervisor.simulationResetPhysics()
 
     def node(self):
         s = self.supervisor.getSelected()
@@ -223,6 +234,9 @@ class DarwinWebotsController:
 
     def set_robot_pose_rpy(self, pos, rpy):
         self.translation_field.setSFVec3f(pos_ros_to_webots(pos))
+        self.rotation_field.setSFRotation(rpy_to_axis(*rpy))
+
+    def set_robot_rpy(self, rpy):
         self.rotation_field.setSFRotation(rpy_to_axis(*rpy))
 
     def get_robot_pose_rpy(self):
