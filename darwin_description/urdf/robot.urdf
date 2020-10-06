@@ -34,8 +34,20 @@
   <material name="temp">
     <color rgba="0.5 0.5 0.8 1.0"/>
   </material>
-  <link name="base_link"/>
-  <link name="imu_frame"/>
+  <link name="base_link">
+  <inertial>
+<origin xyz="0 0 0" rpy="0 0 0" />
+<mass value="1e-9" />
+<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+</inertial>
+</link>
+  <link name="imu_frame">
+  <inertial>
+<origin xyz="0 0 0" rpy="0 0 0" />
+<mass value="1e-9" />
+<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+</inertial>
+</link>
   <link name="MP_BODY">
     <inertial>
       <origin xyz="-0.003053 -0.038651 -0.019268"/>
@@ -554,7 +566,7 @@
     <inertial>
       <origin xyz="0.001424 -0.016567 -0.007128"/>
       <mass value="0.024357719"/>
-      <inertia ixx="0.0051411124" ixy="-0.00057530255" ixz="-0.000024729049" iyy="0.0081915737" iyz="-0.000019223094" izz="0.0011379812"/>
+      <inertia ixx="0.1239683" ixy="0.000078494368" ixz="0.000007645979" iyy="0.11783781" iyz="0.0012199205" izz="0.1583601"/>
     </inertial>
     <collision>
       <origin xyz="0.0 -0.0 0.01525"/>
@@ -591,6 +603,11 @@
     </visual>
   </link>
   <link name="MP_PMDCAMBOARD">
+  <inertial>
+<origin xyz="0 0 0" rpy="0 0 0" />
+<mass value="1e-9" />
+<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+</inertial>
   </link>
   <joint name="j_camboard" type="fixed">
     <parent link="MP_HEAD"/>
@@ -912,8 +929,20 @@
       <material name="grey"/>
     </visual>
   </link>
-  <link name="l_sole"/>
-  <link name="r_sole"/>
+  <link name="l_sole">
+  <inertial>
+<origin xyz="0 0 0" rpy="0 0 0" />
+<mass value="1e-9" />
+<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+</inertial>
+</link>
+  <link name="r_sole">
+  <inertial>
+<origin xyz="0 0 0" rpy="0 0 0" />
+<mass value="1e-9" />
+<inertia ixx="0" ixy="0" ixz="0" iyy="0" iyz="0" izz="0" />
+</inertial>
+</link>
   <joint name="r_sole_joint" type="fixed">
     <parent link="MP_ANKLE2_R"/>
     <child link="r_sole"/>
