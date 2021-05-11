@@ -11,7 +11,7 @@ G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', ros_active=False, mode='normal'):
+    def __init__(self, namespace='', ros_active=False, ros_anonymous=True, mode='normal'):
         self.ros_active = ros_active
         self.time = 0
         self.clock_msg = Clock()
@@ -74,7 +74,7 @@ class DarwinWebotsController:
         self.camera.enable(self.timestep)
 
         if self.ros_active:
-            rospy.init_node("webots_darwin_ros_interface", anonymous=True,
+            rospy.init_node("webots_darwin_ros_interface", anonymous=ros_anonymous,
                             argv=['clock:=/' + self.namespace + '/clock'])
             self.pub_js = rospy.Publisher(self.namespace + "/joint_states", JointState, queue_size=1)
             self.pub_imu = rospy.Publisher(self.namespace + "/imu/data", Imu, queue_size=1)
