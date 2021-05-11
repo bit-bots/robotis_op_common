@@ -103,6 +103,7 @@ class DarwinWebotsController:
             self.publish_imu()
             self.publish_joint_states()
             self.publish_clock()
+            self.publish_camera()
 
     def publish_clock(self):
         self.clock_msg.clock = self.ros_time
