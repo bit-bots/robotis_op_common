@@ -167,6 +167,7 @@ class DarwinWebotsController:
     def publish_camera(self):
         msg = Image()
         msg.header.stamp = self.ros_time
+        msg.header.frame_id = "MP_PMDCAMBOARD"
         msg.height = self.camera.getHeight()
         msg.width = self.camera.getWidth()
         msg.encoding = "bgra8"
