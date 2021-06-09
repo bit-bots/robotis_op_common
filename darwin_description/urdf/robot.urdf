@@ -626,7 +626,7 @@
   <joint name="HeadTilt" type="revolute">
     <parent link="MP_NECK"/>
     <child link="MP_HEAD"/>
-    <origin rpy="-1.5707963 0 1.5707963" xyz="0 0 0.02715"/>
+    <origin rpy="-1.5707963 0.75 1.5707963" xyz="0 0 0.02715"/>
     <axis xyz="0 0 1"/>
     <limit effort="2.8" lower="-0.36" upper="0.94" velocity="5.6548668"/>
   </joint>
