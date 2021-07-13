@@ -1,8 +1,5 @@
-import subprocess
-import time
-
 import tf
-from controller import Robot, Node, Supervisor, Field
+from controller import Supervisor
 import rospy
 from geometry_msgs.msg import Twist
 from sensor_msgs.msg import JointState, Imu, Image
@@ -10,13 +7,12 @@ from rosgraph_msgs.msg import Clock
 
 from bitbots_msgs.msg import JointCommand
 import math
-import os
 
 G = 9.8
 
 
 class DarwinWebotsController:
-    def __init__(self, namespace='', ros_active=True, mode='normal'):
+    def __init__(self, namespace='', ros_active=False, ros_anonymous=True, mode='normal'):
         self.ros_active = ros_active
         self.time = 0
         self.clock_msg = Clock()
@@ -48,26 +44,7 @@ class DarwinWebotsController:
                                         "FootL": "LAnkleRoll",
                                         "Neck": "HeadPan",
                                         "Head": "HeadTilt"}
-        self.names_bitbots_to_webots = {"RShoulderPitch": "ShoulderR",
-                                        "LShoulderPitch": "ShoulderL",
-                                        "RShoulderRoll": "ArmUpperR",
-                                        "LShoulderRoll": "ArmUpperL",
-                                        "RElbow": "ArmLowerR",
-                                        "LElbow": "ArmLowerL",
-                                        "RHipYaw": "PelvYR",
-                                        "LHipYaw": "PelvYL",
-                                        "RHipRoll": "PelvR",
-                                        "LHipRoll": "PelvL",
-                                        "RHipPitch": "LegUpperR",
-                                        "LHipPitch": "LegUpperL",
-                                        "RKnee": "LegLowerR",
-                                        "LKnee": "LegLowerL",
-                                        "RAnklePitch": "AnkleR",
-                                        "LAnklePitch": "AnkleL",
-                                        "RAnkleRoll": "FootR",
-                                        "LAnkleRoll": "FootL",
-                                        "HeadPan": "Neck",
-                                        "HeadTilt": "Head"}
+        self.names_bitbots_to_webots = {v: k for k, v in self.names_webots_to_bitbots.items()}
 
         self.motors = []
         self.sensors = []
@@ -84,27 +61,26 @@ class DarwinWebotsController:
         else:
             self.supervisor.simulationSetMode(Supervisor.SIMULATION_MODE_REAL_TIME)
 
-
         for motor_name in self.motor_names:
-            self.motors.append(self.supervisor.getMotor(motor_name))
+            self.motors.append(self.supervisor.getDevice(motor_name))
             self.motors[-1].enableTorqueFeedback(self.timestep)
-            self.sensors.append(self.supervisor.getPositionSensor(motor_name + "S"))
+            self.sensors.append(self.supervisor.getDevice(motor_name + "S"))
             self.sensors[-1].enable(self.timestep)
 
-        self.accel = self.supervisor.getAccelerometer("Accelerometer")
+        self.accel = self.supervisor.getDevice("Accelerometer")
         self.accel.enable(self.timestep)
-        self.gyro = self.supervisor.getGyro("Gyro")
+        self.gyro = self.supervisor.getDevice("Gyro")
         self.gyro.enable(self.timestep)
-        self.camera = self.supervisor.getCamera("Camera")
+        self.camera = self.supervisor.getDevice("Camera")
         self.camera.enable(self.timestep)
 
         if self.ros_active:
-            rospy.init_node("webots_darwin_ros_interface", anonymous=True,
+            rospy.init_node("webots_darwin_ros_interface", anonymous=ros_anonymous,
                             argv=['clock:=/' + self.namespace + '/clock'])
             self.pub_js = rospy.Publisher(self.namespace + "/joint_states", JointState, queue_size=1)
             self.pub_imu = rospy.Publisher(self.namespace + "/imu/data", Imu, queue_size=1)
             self.pub_cam = rospy.Publisher(self.namespace + "/image_raw", Image, queue_size=1)
-            self.clock_publisher = rospy.Publisher(self.namespace + "/clock", Clock, queue_size=1)
+            self.pub_clock = rospy.Publisher(self.namespace + "/clock", Clock, queue_size=1)
             rospy.Subscriber(self.namespace + "/DynamixelController/command", JointCommand, self.command_cb)
 
         self.world_info = self.supervisor.getFromDef("world_info")
@@ -113,6 +89,10 @@ class DarwinWebotsController:
         self.robot_node = self.supervisor.getFromDef("Darwin")
         self.translation_field = self.robot_node.getField("translation")
         self.rotation_field = self.robot_node.getField("rotation")
+
+    @property
+    def ros_time(self) -> rospy.Time:
+        return rospy.Time.from_seconds(self.time)
 
     def step_sim(self):
         self.time += self.timestep / 1000
@@ -124,10 +104,11 @@ class DarwinWebotsController:
             self.publish_imu()
             self.publish_joint_states()
             self.publish_clock()
+            self.publish_camera()
 
     def publish_clock(self):
-        self.clock_msg.clock = rospy.Time.from_seconds(self.time)
-        self.clock_publisher.publish(self.clock_msg)
+        self.clock_msg.clock = self.ros_time
+        self.pub_clock.publish(self.clock_msg)
 
     def command_cb(self, command: JointCommand):
         for i, name in enumerate(command.joint_names):
@@ -135,35 +116,41 @@ class DarwinWebotsController:
                 motor_index = self.motor_names.index(self.names_bitbots_to_webots[name])
                 self.motors[motor_index].setPosition(command.positions[i])
             except ValueError:
-                print(f"invalid motor specified ({self.names_bitbots_to_webots[name]})")
+                rospy.logerr(f"invalid motor specified ({self.names_bitbots_to_webots[name]})")
 
-    def get_joint_state_msg(self):
-        js = JointState()
-        js.name = []
-        js.header.stamp = rospy.Time.from_seconds(self.time)
-        js.position = []
-        js.effort = []
-        for i in range(len(self.sensors)):
-            js.name.append(self.names_webots_to_bitbots[self.motor_names[i]])
-            value = self.sensors[i].getValue()
-            js.position.append(value)
-            js.effort.append(self.motors[i].getTorqueFeedback())
-        if self.ros_active:
-            self.pub_js.publish(js)
-        return js
+    def set_head_tilt(self, pos):
+        self.motors[-1].setPosition(pos)
+
+    def set_arms_zero(self):
+        positions = [-0.8399999308200574, 0.7200000596634105, -0.3299999109923385, 0.35999992683575216,
+                     0.5099999812500172, -0.5199999789619728]
+        for i in range(0, 6):
+            self.motors[i].setPosition(positions[i])
 
     def publish_joint_states(self):
-        self.pub_js.publish(self.get_joint_state_msg())
+        msg = JointState()
+        msg.name = []
+        msg.header.stamp = self.ros_time
+        msg.position = []
+        msg.effort = []
+        for i in range(len(self.sensors)):
+            msg.name.append(self.names_webots_to_bitbots[self.motor_names[i]])
+            value = self.sensors[i].getValue()
+            msg.position.append(value)
+            msg.effort.append(self.motors[i].getTorqueFeedback())
 
-    def get_imu_msg(self):
+        self.pub_js.publish(msg)
+
+    def publish_imu(self):
         msg = Imu()
-        msg.header.stamp = rospy.Time.from_seconds(self.time)
+        msg.header.stamp = self.ros_time
         msg.header.frame_id = "imu_frame"
-        accel_vels = self.accel.getValues()
 
+        accel_vels = self.accel.getValues()
         msg.linear_acceleration.x = ((accel_vels[0] - 512.0) / 512.0) * 3 * G
         msg.linear_acceleration.y = ((accel_vels[1] - 512.0) / 512.0) * 3 * G
         msg.linear_acceleration.z = ((accel_vels[2] - 512.0) / 512.0) * 3 * G
+
         gyro_vels = self.gyro.getValues()
         msg.angular_velocity.x = ((gyro_vels[0] - 512.0) / 512.0) * 1600 * (
                 math.pi / 180)  # is 400 deg/s the real value
@@ -175,30 +162,29 @@ class DarwinWebotsController:
         msg.orientation.y = 0
         msg.orientation.z = 0
         msg.orientation.w = 1
-        return msg
 
-    def publish_imu(self):
-        self.pub_imu.publish(self.get_imu_msg())
+        self.pub_imu.publish(msg)
 
     def publish_camera(self):
-        img_msg = Image()
-        img_msg.header.stamp = rospy.Time.from_seconds(self.time)
-        img_msg.height = self.camera.getHeight()
-        img_msg.width = self.camera.getWidth()
-        img_msg.encoding = "bgra8"
-        img_msg.step = 4 * self.camera.getWidth()
+        msg = Image()
+        msg.header.stamp = self.ros_time
+        msg.header.frame_id = "MP_PMDCAMBOARD"
+        msg.height = self.camera.getHeight()
+        msg.width = self.camera.getWidth()
+        msg.encoding = "bgra8"
+        msg.step = 4 * self.camera.getWidth()
         img = self.camera.getImage()
-        img_msg.data = img
-        self.pub_cam.publish(img_msg)
+        msg.data = img
 
-    def get_image(self):
-        return self.camera.getImage()
+        self.pub_cam.publish(msg)
 
     def set_gravity(self, active):
         if active:
             self.world_info.getField("gravity").setSFVec3f([0.0, -9.81, 0.0])
+            self.world_info.getField("gravity").setSFFloat(9.81)
         else:
             self.world_info.getField("gravity").setSFVec3f([0.0, 0.0, 0.0])
+            self.world_info.getField("gravity").setSFFloat(0)
 
     def reset_robot_pose(self, pos, quat):
         rpy = tf.transformations.euler_from_quaternion(quat)
@@ -210,7 +196,12 @@ class DarwinWebotsController:
         self.robot_node.resetPhysics()
 
     def reset(self):
-        self.supervisor.simulationReset()
+        # self.supervisor.simulationReset()
+        # reactivate camera after reset https://github.com/cyberbotics/webots/issues/1778
+        # self.supervisor.getSelf().restartController()
+        # self.camera = self.supervisor.getCamera("Camera")
+        # self.camera.enable(self.timestep)
+        self.supervisor.simulationResetPhysics()
 
     def node(self):
         s = self.supervisor.getSelected()
@@ -219,6 +210,9 @@ class DarwinWebotsController:
 
     def set_robot_pose_rpy(self, pos, rpy):
         self.translation_field.setSFVec3f(pos_ros_to_webots(pos))
+        self.rotation_field.setSFRotation(rpy_to_axis(*rpy))
+
+    def set_robot_rpy(self, rpy):
         self.rotation_field.setSFRotation(rpy_to_axis(*rpy))
 
     def get_robot_pose_rpy(self):
