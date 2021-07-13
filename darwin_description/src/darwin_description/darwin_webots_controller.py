@@ -4,6 +4,7 @@ import time
 import tf
 from controller import Robot, Node, Supervisor, Field
 import rospy
+from geometry_msgs.msg import Twist
 from sensor_msgs.msg import JointState, Imu, Image
 from rosgraph_msgs.msg import Clock
 
